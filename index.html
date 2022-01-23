@@ -1,113 +1,121 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>socket-io-template</title>
-    <style>
-      body {
-        margin: 0;
-      }
-      .field{
-        width:100%;
-        height:100vh;
-        position:relative;
-        overflow:hidden;
-        background:#cfc;
-      }
-      .my-pointer, .their-pointer{
-        will-change: left,top;
-        position:absolute;
-        left:0;
-        top:0;
-        width:20px;
-        height:20px;
-        transform:translate(-50%,-50%);
-        border-radius:9999px;
-        pointer-events: none;
 
-      }
-      .my-pointer{
-        background:#f00;
-      }
-      .their-pointer{
-        background:#00f;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="field">
-      <div class="my-pointer"></div>
-    </div>
+<head>
+  <title>socket-io-template</title>
+  <style>
+    body {
+      margin: 0;
+    }
 
-    <script src="/socket.io/socket.io.js"></script>
-    <script>
-      const socket = io();
-      const FPS=10;
-      const myPosition={
-        x:0,
-        y:0,
-      };
-      const field=document.querySelector(".field");
-      const myPointer=document.querySelector(".my-pointer");
+    .field {
+      width: 100%;
+      height: 100vh;
+      position: relative;
+      overflow: hidden;
+      background: #cfc;
+    }
+
+    .my-pointer,
+    .their-pointer {
+      will-change: left, top;
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 20px;
+      height: 20px;
+      transform: translate(-50%, -50%);
+      border-radius: 9999px;
+      pointer-events: none;
+
+    }
+
+    .my-pointer {
+      background: #f00;
+    }
+
+    .their-pointer {
+      background: #00f;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="field">
+    <div class="my-pointer"></div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const FPS = 10;
+    const myPosition = {
+      x: 0,
+      y: 0,
+    };
+    const field = document.querySelector(".field");
+    const myPointer = document.querySelector(".my-pointer");
 
 
-      function updateMyPosition({x,y}){
-        myPosition.x=x;
-        myPosition.y=y;
-        myPointer.style.left=`${x}px`;
-        myPointer.style.top=`${y}px`;
-      }
+    function updateMyPosition({ x, y }) {
+      myPosition.x = x;
+      myPosition.y = y;
+      myPointer.style.left = `${x}px`;
+      myPointer.style.top = `${y}px`;
+    }
 
 
-      setInterval(()=>{
-        socket.emit('my move', myPosition);
-      },1000 / FPS);
+    setInterval(() => {
+      socket.emit('my move', myPosition);
+    }, 1000 / FPS);
 
-      field.addEventListener("mousemove",(event)=>{
-        updateMyPosition({
-          x:event.offsetX,
-          y:event.offsetY,
-        });
-      })
-    
-      function getTheirPointer(id){
-        const theirPointerList=Array.from(document.querySelectorAll(".their-pointer"));
-        const theirPointer=theirPointerList.find((theirPointer)=>theirPointer.dataset.id==id);
-        return theirPointer;
-      }
-
-      socket.on('create',({id})=>{
-        console.log('create',{id});
-        if(socket.id==id){
-          // 何もしない
-          return;
-        }
-        let theirPointer=getTheirPointer(id);
-        if(!theirPointer){
-          theirPointer=document.createElement("div");
-          theirPointer.classList.add("their-pointer");
-          // 画面外に置いておく
-          theirPointer.style.top="-100px";
-          theirPointer.dataset.id=id;
-          field.appendChild(theirPointer);
-        }
+    field.addEventListener("mousemove", (event) => {
+      updateMyPosition({
+        x: event.offsetX,
+        y: event.offsetY,
       });
-      socket.on('destroy',({id})=>{
-        console.log('destroy',{id});
-        let theirPointer=getTheirPointer(id);
-        if(theirPointer){
-          theirPointer.remove();
-        }
+    })
 
-      })
-    
-      socket.on('their move', function({x,y,id}) {
-        // console.log({x,y,id});
-        let theirPointer=getTheirPointer(id);
-        if(theirPointer){
-          theirPointer.style.left=`${x}px`;
-          theirPointer.style.top=`${y}px`;
-        }
-      });
-    </script>
-  </body>
+    function getTheirPointer(id) {
+      const theirPointerList = Array.from(document.querySelectorAll(".their-pointer"));
+      const theirPointer = theirPointerList.find((theirPointer) => theirPointer.dataset.id == id);
+      return theirPointer;
+    }
+
+    socket.on('create', ({ id }) => {
+      console.log('create', { id });
+      if (socket.id == id) {
+        // 何もしない
+        return;
+      }
+      let theirPointer = getTheirPointer(id);
+      if (!theirPointer) {
+        theirPointer = document.createElement("div");
+        theirPointer.classList.add("their-pointer");
+        // 画面外に置いておく
+        theirPointer.style.top = "-100px";
+        theirPointer.dataset.id = id;
+        field.appendChild(theirPointer);
+      }
+    });
+    socket.on('destroy', ({ id }) => {
+      console.log('destroy', { id });
+      let theirPointer = getTheirPointer(id);
+      if (theirPointer) {
+        theirPointer.remove();
+      }
+
+    })
+
+    socket.on('their move', function ({ x, y, id }) {
+      // console.log({x,y,id});
+      let theirPointer = getTheirPointer(id);
+      if (theirPointer) {
+        theirPointer.style.left = `${x}px`;
+        theirPointer.style.top = `${y}px`;
+      }
+    });
+  </script>
+</body>
+
 </html>
