@@ -1,0 +1,17 @@
+{
+  "name": "socket-io-template",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ./index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Yusuke Kawamoto <novogrammer@gmail.com> (https://github.com/novogrammer/)",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.2",
+    "socket.io": "^4.4.1"
+  }
+}
