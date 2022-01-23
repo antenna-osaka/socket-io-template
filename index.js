@@ -10,8 +10,32 @@ app.get('/', (req, res) => {
 });
 
 io.on('connection', (socket) => {
-  socket.on('chat message', (msg) => {
-    io.emit('chat message', msg);
+
+  io.emit('create',{
+    id:socket.id,
+  })
+  // 後から自分が入った時に、先客を知っておく必要がある。
+  // 非同期実行である点に注意
+  io.allSockets().then((ids)=>{
+    for(let id of ids.keys()){
+      socket.emit('create',{
+        id,
+      });
+    }
+  });
+
+  socket.on('disconnect',()=>{
+    io.emit('destroy',{
+      id:socket.id,
+    })
+  })
+
+  socket.on('my move', ({x,y}) => {
+    io.emit('their move', {
+      x,
+      y,
+      id:socket.id,
+    });
   });
 });
 
